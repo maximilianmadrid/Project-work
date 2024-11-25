@@ -1,0 +1,43 @@
+import pandas as pd
+from collections import defaultdict
+
+# Goal: Analyze sales data to identify best-selling items per store and across the entire corporation using market basket analysis principles.
+
+# ... (Existing code from previous responses) ...
+
+def analyze_best_selling_items(sales_df):
+    """Analyzes sales data to find best-selling items."""
+
+    # Analyze best-selling items per store
+    store_bestsellers = {}
+    for store_id in sales_df["StoreID"].unique():
+        store_data = sales_df[sales_df["StoreID"] == store_id]
+        product_counts = defaultdict(int)
+        for _, row in store_data.iterrows():
+            for product in row["Products"]:
+                product_counts[product] += 1
+        store_bestsellers[store_id] = dict(sorted(product_counts.items(), key=lambda item: item[1], reverse=True))
+
+    # Analyze best-selling items across the entire corporation
+    overall_product_counts = defaultdict(int)
+    for _, row in sales_df.iterrows():
+      for product in row["Products"]:
+          overall_product_counts[product] += 1
+    overall_bestsellers = dict(sorted(overall_product_counts.items(), key=lambda item: item[1], reverse=True))
+
+    return store_bestsellers, overall_bestsellers
+
+
+# Analyze sales data
+store_bestsellers, overall_bestsellers = analyze_best_selling_items(sales_df)
+
+# Print results
+print("\nBest-selling items per store:")
+for store_id, products in store_bestsellers.items():
+    print(f"\nStore {store_id}:")
+    for product, count in products.items():
+        print(f"  {product}: {count}")
+
+print("\nOverall best-selling items:")
+for product, count in overall_bestsellers.items():
+    print(f"  {product}: {count}")
