@@ -1,0 +1,104 @@
+import pandas as pd
+import random
+from datetime import datetime, timedelta
+
+# Define the Product class
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+# Define the Order class
+class Order:
+    def __init__(self, order_id, products, customer_id, store_id):
+        self.order_id = order_id
+        self.products = products
+        self.customer_id = customer_id
+        self.store_id = store_id
+        self.timestamp = datetime.now() - timedelta(days=random.randint(0, 6),
+                                                    hours=random.randint(0, 23),
+                                                    minutes=random.randint(0, 59))
+
+    def total_price(self):
+        return sum(product.price for product in self.products)
+
+# Define the Customer class
+class Customer:
+    def __init__(self, customer_id):
+        self.customer_id = customer_id
+
+    def create_order(self, product_list, store_id):
+        order_id = random.randint(1000, 9999)
+        selected_products = random.sample(product_list, random.randint(1, len(product_list)))
+        return Order(order_id, selected_products, self.customer_id, store_id)
+
+# Define the Store class
+class Store:
+    def __init__(self, store_id):
+        self.store_id = store_id
+        self.orders = []
+
+    def add_order(self, order):
+        self.orders.append(order)
+
+# Define the Corporation class to manage data generation and reporting
+class Corporation:
+    def __init__(self, name):
+        self.name = name
+        self.stores = []
+        self.customers = []
+
+    def add_store(self, store):
+        self.stores.append(store)
+
+    def add_customer(self, customer):
+        self.customers.append(customer)
+
+    def generate_sales_data(self, products):
+        for store in self.stores:
+            for customer in self.customers:
+                order = customer.create_order(products, store.store_id)
+                store.add_order(order)
+
+    def generate_sales_report(self):
+        all_orders = []
+        for store in self.stores:
+            for order in store.orders:
+                all_orders.append({
+                    "Timestamp": order.timestamp,
+                    "Date": order.timestamp.strftime("%Y-%m-%d"),
+                    "Time": order.timestamp.strftime("%H:%M:%S"),
+                    "StoreID": order.store_id,
+                    "CustomerID": order.customer_id,
+                    "OrderID": order.order_id,
+                    "Products": [product.name for product in order.products],
+                    "TotalPrice": round(order.total_price(), 2)
+                })
+        return pd.DataFrame(all_orders)
+
+# Set up the corporation and generate data
+corp = Corporation("Global Corp")
+
+# Add 10 stores
+for i in range(1, 11):
+    corp.add_store(Store(i))
+
+# Add 14 customers
+for i in range(1001, 1015):
+    corp.add_customer(Customer(i))
+
+# Define a list of products with prices
+products = [
+    Product("Apple", 1.50), Product("Banana", 0.75), Product("Orange", 1.00),
+    Product("Grapes", 2.50), Product("Strawberry", 3.00), Product("Broccoli", 1.75),
+    Product("Carrot", 0.50), Product("Tomato", 1.25), Product("Potato", 0.75),
+    Product("Lettuce", 1.50), Product("Cucumber", 0.80), Product("Avocado", 2.00),
+    Product("Mango", 1.75), Product("Pineapple", 3.50), Product("Watermelon", 5.00)
+]
+
+# Generate synthetic sales data
+corp.generate_sales_data(products)
+
+# Convert sales report to a Pandas DataFrame and display
+sales_df = corp.generate_sales_report()
+print(sales_df.head())
