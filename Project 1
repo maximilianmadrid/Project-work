@@ -1,0 +1,139 @@
+# prompt: add in code so that each store's total sales is listed at the end, as well as the total corporation sales, rounding all prices to the second decimal place
+
+import random
+from datetime import datetime, timedelta
+
+
+class Product:
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+
+    def __str__(self):
+        return f"{self.name} (${self.price})"
+
+
+class Order:
+    def __init__(self, order_id, products, customer_id, store_id):
+        self.order_id = order_id
+        self.products = products
+        self.customer_id = customer_id
+        self.store_id = store_id
+        self.timestamp = datetime.now() - timedelta(days=random.randint(0, 6),
+                                                    hours=random.randint(0, 23),
+                                                    minutes=random.randint(0, 59))
+
+    def total_price(self):
+        return sum(product.price for product in self.products)
+
+
+class Customer:
+    def __init__(self, customer_id):
+        self.customer_id = customer_id
+        self.orders = []
+
+    def create_order(self, products_list, store_id):
+        order_id = random.randint(1000, 9999)
+        num_products = random.randint(1, len(products_list))
+        selected_products = random.sample(products_list, num_products)
+        selected_products.sort(key=lambda x: x.price, reverse=True)
+        order = Order(order_id, selected_products, self.customer_id, store_id)
+        self.orders.append(order)
+        return order
+
+
+class Store:
+    def __init__(self, store_id):
+        self.store_id = store_id
+        self.orders = []
+
+    def record_order(self, customer, products):
+        order = customer.create_order(products, self.store_id)
+        self.orders.append(order)
+        return order
+
+    def get_total_sales(self):
+        return round(sum(order.total_price() for order in self.orders), 2)
+
+
+class Corporation:
+    def __init__(self, name):
+        self.name = name
+        self.stores = []
+
+    def add_store(self, store):
+        self.stores.append(store)
+
+    def generate_sales_report(self):
+        all_orders = []
+        for store in self.stores:
+            for order in store.orders:
+                date_str = order.timestamp.strftime("%Y-%m-%d")
+                time_str = order.timestamp.strftime("%H:%M:%S")
+                product_info = [str(product) for product in order.products]
+                all_orders.append((order.timestamp, date_str, time_str,
+                                   order.store_id, order.customer_id,
+                                   order.order_id, product_info,
+                                   round(order.total_price(), 2)))
+
+        all_orders.sort(key=lambda x: x[0], reverse=True)
+
+        print("Date, Time, StoreID, CustomerID, OrderID, Products, Total")
+        for timestamp, date_str, time_str, store_id, customer_id, order_id, products, total in all_orders:
+            print(f"{date_str}, {time_str}, {store_id}, {customer_id}, {order_id}, {products}, {total}")
+
+        # Calculate and print total sales for each store
+        for store in self.stores:
+            print(f"Store {store.store_id} Total Sales: ${store.get_total_sales()}")
+
+        # Calculate and print total corporation sales
+        total_corp_sales = round(sum(store.get_total_sales() for store in self.stores), 2)
+        print(f"Total Corporation Sales: ${total_corp_sales}")
+
+
+if __name__ == "__main__":
+    corp = Corporation("Global Corp")
+    for i in range(1, 11):
+        corp.add_store(Store(i))
+
+    # Top grocery brands and items
+    top_15_grocery_brands = [
+        "Whole Foods", "Trader Joe's", "Kroger", "Walmart", "Costco", "Aldi", "Safeway",
+        "Publix", "Sprouts", "Albertsons", "Hy-Vee", "Meijer", "H-E-B", "Wegmans", "Giant"
+    ]
+
+    top_15_grocery_items_with_pricing = [
+        ("Bread", 2.50),
+        ("Milk", 3.00),
+        ("Eggs", 2.00),
+        ("Cheese", 5.00),
+        ("Chicken Breast", 8.00),
+        ("Ground Beef", 6.00),
+        ("Apples", 1.50),
+        ("Bananas", 0.50),
+        ("Potatoes", 3.00),
+        ("Rice", 2.00),
+        ("Pasta", 1.50),
+        ("Cereal", 4.00),
+        ("Orange Juice", 3.50),
+        ("Yogurt", 1.00),
+        ("Butter", 2.50)
+    ]
+
+    generated_products = []
+    for _ in range(20):  # Generate 20 random products
+        brand = random.choice(top_15_grocery_brands)
+        item, base_price = random.choice(top_15_grocery_items_with_pricing)
+        # Introduce slight price variation based on brand
+        price_variation = random.uniform(-0.1, 0.1)  # +/- 10% variation
+        price = round(base_price * (1 + price_variation), 2)
+        product_name = f"{brand} {item}"
+        generated_products.append(Product(product_name, price))
+
+
+    customers = [Customer(i) for i in range(1001, 1015)]
+
+    for i in range(len(corp.stores)):
+        corp.stores[i].record_order(customers[i % len(customers)], generated_products)
+
+    corp.generate_sales_report()
