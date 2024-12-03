@@ -1,0 +1,13 @@
+                   Timestamp        Date      Time  StoreID  CustomerID  \
+0 2024-11-23 12:05:19.146058  2024-11-23  12:05:19        1        1001   
+1 2024-11-21 12:57:19.146088  2024-11-21  12:57:19        1        1002   
+2 2024-11-20 21:17:19.146101  2024-11-20  21:17:19        1        1003   
+3 2024-11-20 11:19:19.146112  2024-11-20  11:19:19        1        1004   
+4 2024-11-21 09:35:19.146127  2024-11-21  09:35:19        1        1005   
+
+   OrderID                                           Products  TotalPrice  
+0     9945  [Potato, Orange, Avocado, Broccoli, Grapes, Pi...       23.50  
+1     7450  [Tomato, Pineapple, Cucumber, Strawberry, Banana]        9.30  
+2     4237                [Broccoli, Cucumber, Orange, Apple]        5.05  
+3     9848                                  [Avocado, Banana]        2.75  
+4     2817  [Avocado, Grapes, Orange, Apple, Carrot, Brocc...       17.25
